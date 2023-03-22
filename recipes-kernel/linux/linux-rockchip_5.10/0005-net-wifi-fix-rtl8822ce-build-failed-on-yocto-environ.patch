@@ -1,0 +1,76 @@
+From e235f1e779b691fb0054403bcc579371fe9928cd Mon Sep 17 00:00:00 2001
+From: Rock Shen <rock_shen@asus.com>
+Date: Fri, 17 Mar 2023 08:24:50 +0800
+Subject: [PATCH] net: wifi: fix rtl8822ce build failed on yocto environment
+
+Change-Id: I485911c362702ac18a2449f207947525d2ca3a38
+Signed-off-by: Rock Shen <rock_shen@asus.com>
+---
+ drivers/net/wireless/rockchip_wlan/rtl8822ce/Makefile  | 10 +++++-----
+ .../rockchip_wlan/rtl8822ce/hal/phydm/phydm.mk         |  4 ++--
+ 2 files changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/net/wireless/rockchip_wlan/rtl8822ce/Makefile b/drivers/net/wireless/rockchip_wlan/rtl8822ce/Makefile
+index de3da2b5156d..a58060ae5124 100755
+--- a/drivers/net/wireless/rockchip_wlan/rtl8822ce/Makefile
++++ b/drivers/net/wireless/rockchip_wlan/rtl8822ce/Makefile
+@@ -20,7 +20,7 @@ ifeq ($(GCC_VER_49),1)
+ EXTRA_CFLAGS += -Wno-date-time	# Fix compile error && warning on gcc 4.9 and later
+ endif
+ 
+-EXTRA_CFLAGS += -I$(src)/include
++EXTRA_CFLAGS += -I$(srctree)/$(src)/include
+ 
+ EXTRA_LDFLAGS += --strip-debug
+ 
+@@ -276,10 +276,10 @@ _HAL_INTFS_FILES :=	hal/hal_intf.o \
+ 			hal/led/hal_$(HCI_NAME)_led.o
+ 
+ 
+-EXTRA_CFLAGS += -I$(src)/platform
++EXTRA_CFLAGS += -I$(srctree)/$(src)/platform
+ _PLATFORM_FILES := platform/platform_ops.o
+ 
+-EXTRA_CFLAGS += -I$(src)/hal/btc
++EXTRA_CFLAGS += -I$(srctree)/$(src)/hal/btc
+ 
+ ########### HAL_RTL8188E #################################
+ ifeq ($(CONFIG_RTL8188E), y)
+@@ -2348,7 +2348,7 @@ endif
+ ifneq ($(KERNELRELEASE),)
+ 
+ ########### this part for *.mk ############################
+-include $(src)/hal/phydm/phydm.mk
++include $(srctree)/$(src)/hal/phydm/phydm.mk
+ 
+ ########### HAL_RTL8822B #################################
+ ifeq ($(CONFIG_RTL8822B), y)
+@@ -2422,7 +2422,7 @@ ifeq ($(CONFIG_SDIO_HCI), y)
+ rtk_core += core/rtw_sdio.o
+ endif
+ 
+-EXTRA_CFLAGS += -I$(src)/core/crypto
++EXTRA_CFLAGS += -I$(srctree)/$(src)/core/crypto
+ rtk_core += \
+ 		core/crypto/aes-internal.o \
+ 		core/crypto/aes-internal-enc.o \
+diff --git a/drivers/net/wireless/rockchip_wlan/rtl8822ce/hal/phydm/phydm.mk b/drivers/net/wireless/rockchip_wlan/rtl8822ce/hal/phydm/phydm.mk
+index 042db19d26ba..dcf919909781 100755
+--- a/drivers/net/wireless/rockchip_wlan/rtl8822ce/hal/phydm/phydm.mk
++++ b/drivers/net/wireless/rockchip_wlan/rtl8822ce/hal/phydm/phydm.mk
+@@ -1,4 +1,4 @@
+-EXTRA_CFLAGS += -I$(src)/hal/phydm
++EXTRA_CFLAGS += -I$(srctree)/$(src)/hal/phydm
+ 
+ _PHYDM_FILES := hal/phydm/phydm_debug.o	\
+ 								hal/phydm/phydm_antdiv.o\
+@@ -245,4 +245,4 @@ _PHYDM_FILES += hal/phydm/$(RTL871X)/halhwimg8723f_bb.o\
+ 								hal/phydm/halrf/$(RTL871X)/halrf_dpk_8723f.o\
+ 								hal/phydm/halrf/$(RTL871X)/halrf_rfk_init_8723f.o\
+ 								hal/phydm/halrf/$(RTL871X)/halhwimg8723f_rf.o
+-endif
+\ No newline at end of file
++endif
+-- 
+2.17.1
+
