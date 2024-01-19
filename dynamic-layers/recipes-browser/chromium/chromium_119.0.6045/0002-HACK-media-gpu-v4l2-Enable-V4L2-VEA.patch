@@ -1,27 +1,22 @@
-From 96c3eac10c833f8654f98bb4ec8f1ba22cca5897 Mon Sep 17 00:00:00 2001
+From 118cce3f565640185f101c8d987a17df086913fb Mon Sep 17 00:00:00 2001
 From: Jeffy Chen <jeffy.chen@rock-chips.com>
 Date: Mon, 13 Feb 2023 15:30:55 +0800
-Subject: [PATCH 02/20] HACK: media: gpu: v4l2: Allow V4L2 VEA on non-chromeos
- platform
-
-NOTE(crbug.com/901264):
-Encoders use hack for passing offset within a DMA-buf, which is not
-supported upstream.
+Subject: [PATCH 02/17] HACK: media: gpu: v4l2: Enable V4L2 VEA
 
 Signed-off-by: Jeffy Chen <jeffy.chen@rock-chips.com>
 ---
  media/gpu/gpu_video_encode_accelerator_factory.cc | 3 ++-
- media/gpu/v4l2/BUILD.gn                           | 2 +-
- 2 files changed, 3 insertions(+), 2 deletions(-)
+ media/gpu/v4l2/BUILD.gn                           | 5 +++++
+ 2 files changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/media/gpu/gpu_video_encode_accelerator_factory.cc b/media/gpu/gpu_video_encode_accelerator_factory.cc
-index 71d15a3..800f72f 100644
+index a5fd9b716..08fed189d 100644
 --- a/media/gpu/gpu_video_encode_accelerator_factory.cc
 +++ b/media/gpu/gpu_video_encode_accelerator_factory.cc
-@@ -51,7 +51,8 @@ std::unique_ptr<VideoEncodeAccelerator> CreateV4L2VEA() {
-   scoped_refptr<V4L2Device> device = V4L2Device::Create();
-   if (!device)
-     return nullptr;
+@@ -48,7 +48,8 @@ namespace media {
+ namespace {
+ #if BUILDFLAG(USE_V4L2_CODEC)
+ std::unique_ptr<VideoEncodeAccelerator> CreateV4L2VEA() {
 -#if BUILDFLAG(IS_CHROMEOS)
 +/* HACK: Enable V4L2 VEA for v4l-rkmpp */
 +#if 1 // BUILDFLAG(IS_CHROMEOS)
@@ -29,18 +24,22 @@ index 71d15a3..800f72f 100644
    // a DMA-buf, which is not supported upstream.
    return base::WrapUnique<VideoEncodeAccelerator>(
 diff --git a/media/gpu/v4l2/BUILD.gn b/media/gpu/v4l2/BUILD.gn
-index 9cc44f7..5f0caac 100644
+index f442ce0f7..0d93063c0 100644
 --- a/media/gpu/v4l2/BUILD.gn
 +++ b/media/gpu/v4l2/BUILD.gn
-@@ -85,7 +85,7 @@ source_set("v4l2") {
-     }
-   }
+@@ -97,7 +97,12 @@ source_set("v4l2") {
+       # AV1 delegate depends on header files only in ChromeOS SDK
+       "v4l2_video_decoder_delegate_av1.cc",
+       "v4l2_video_decoder_delegate_av1.h",
++    ]
++  }
  
--  if (is_chromeos) {
-+  if (true) { # if (is_chromeos) {
-     sources += [
++  # HACK: Enable V4L2 VEA for v4l-rkmpp.
++  if (true) {
++    sources += [
        # TODO(crbug.com/901264): Encoders use hack for passing offset
        # within a DMA-buf, which is not supported upstream.
+       "v4l2_video_encode_accelerator.cc",
 -- 
-2.20.1
+2.38.5
 
