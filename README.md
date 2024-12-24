@@ -12,11 +12,11 @@ Please see the corresponding sections below for details.
 This layer depends on:
 
 * URI: git://git.yoctoproject.org/poky
-* branch: kirkstone
+* branch: scarthgap
 
 * URI: git://git.openembedded.org/meta-openembedded
 * layers: meta-oe
-* branch: kirkstone
+* branch: scarthgap
 
 ## Table of Contents
 
@@ -36,8 +36,8 @@ In order to build an image with BSP support for a given release, you need to dow
 
 ```shell
 ~ $ mkdir yocto; cd yocto
-~/yocto $ git clone git://git.yoctoproject.org/poky -b kirkstone
-~/yocto $ git clone git://git.openembedded.org/meta-openembedded.git -b kirkstone
+~/yocto $ git clone git://git.yoctoproject.org/poky -b scarthgap
+~/yocto $ git clone git://git.openembedded.org/meta-openembedded.git -b scarthgap
 ```
 
 And put the meta-rockchip layer here too.
@@ -134,7 +134,7 @@ For example:
 KBUILD_DEFCONFIG = "rk3326_linux_defconfig"
 KERNEL_DEVICETREE = "rockchip/rk3326-evb-lp3-v10-linux.dtb"
 UBOOT_MACHINE = "evb-rk3326_defconfig"
-RK_WIFIBT_FIRMWARES = " \
+RK_WIFIBT_RRECOMMENDS = " \
         rkwifibt-firmware-ap6212a1-wifi \
         rkwifibt-firmware-ap6212a1-bt \
         brcm-tools \

@@ -3,9 +3,10 @@
 
 require conf/machine/include/rk356x.inc
 
-SOC_FAMILY := "rk3562"
+RK_SOC_FAMILY := "rk3562"
 
 PREFERRED_VERSION_linux-rockchip := "5.10%"
 LINUXLIBCVERSION := "5.10-custom%"
+OLDEST_KERNEL := "5.10"
 
 RK_ISP_VERSION := "3.2_LITE"

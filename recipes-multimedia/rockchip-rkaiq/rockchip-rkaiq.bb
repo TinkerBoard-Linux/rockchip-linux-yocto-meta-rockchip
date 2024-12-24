@@ -15,9 +15,9 @@ PACKAGE_ARCH = "${MACHINE_ARCH}"
 
 inherit local-git
 
-SRCREV = "be96b36bab4c3533f7cd011385539b565578ab8b"
+SRCREV = "bd19d1ee0d4c21945f156f75a8eb1cdafed2777a"
 SRC_URI = " \
-	git://github.com/JeffyCN/mirrors.git;protocol=https;nobranch=1;branch=rkaiq-2023_04_04; \
+	git://github.com/JeffyCN/mirrors.git;protocol=https;nobranch=1;branch=rkaiq-2024_04_08; \
 	file://rkaiq_daemons.sh \
 "
 
@@ -25,10 +25,12 @@ S = "${WORKDIR}/git"
 
 inherit pkgconfig cmake
 
+RK_ISP_VERSION ?= ""
+RK_SOC_FAMILY ?= ""
 EXTRA_OECMAKE = "     \
     -DARCH=${@bb.utils.contains('TUNE_FEATURES', 'aarch64', 'aarch64', 'arm', d)} \
     -DISP_HW_VERSION=-DISP_HW_V${@d.getVar('RK_ISP_VERSION').replace('.','')} \
-    -DRKAIQ_TARGET_SOC=${@d.getVar('SOC_FAMILY').replace('rk3568','rk356x')} \
+    -DRKAIQ_TARGET_SOC=${@d.getVar('RK_SOC_FAMILY').replace('rk3568','rk356x')} \
 "
 
 do_generate_toolchain_file:append () {
@@ -43,6 +45,8 @@ do_generate_toolchain_file:append () {
 	sed -i 's/if ( !pattr )/if ( pattr )/' ${S}/rkaiq/iq_parser/xmltags.cpp
 	sed -i '/\<prebuilts\>/d' ${S}/rkaiq_3A_server/CMakeLists.txt
 	sed -i 's/\(add_library(.* STATIC IMPORTED\))/\1 GLOBAL)/' ${S}/rkaiq/algos/CMakeLists.txt
+	sed -i 's/-Werror//' ${S}/rkaiq/cmake/CompileOptions.cmake
+	sed -i '/#include <stdlib.h>/i#include <stdio.h>' ${S}/rkaiq/ipc_server/MessageParser.hpp
 }
 
 do_install:append () {
@@ -51,28 +55,14 @@ do_install:append () {
 	rm -rf ${D}/usr/etc ${D}/usr/usr ${D}/usr/bin/*demo \
 		${D}/usr/bin/rkaiq_tool_server
 
-	chrpath -d ${D}/usr/lib/libsmartIr.so
+	chrpath -d ${D}/${libdir}/libsmartIr.so
 
 	install -d ${D}${sysconfdir}/iqfiles
+	ln -sf isp3x ${S}/rkaiq/iqfiles/isp30
 
-	case "${RK_ISP_VERSION}" in
-		2.0)
-			install -m 0644 ${S}/rkaiq/iqfiles/isp20/*.json \
-				${D}${sysconfdir}/iqfiles/
-			;;
-		2.1)
-			install -m 0644 ${S}/rkaiq/iqfiles/isp21/*.json \
-				${D}${sysconfdir}/iqfiles/
-			;;
-		3.0)
-			install -m 0644 ${S}/rkaiq/iqfiles/isp3x/*.json \
-				${D}${sysconfdir}/iqfiles/
-			;;
-		3.2_LITE)
-			install -m 0644 ${S}/rkaiq/iqfiles/isp32_lite/*.json \
-				${D}${sysconfdir}/iqfiles/
-			;;
-	esac
+	IQFILES_DIR="$(echo isp${RK_ISP_VERSION} | tr 'A-Z' 'a-z' | tr -d '.')"
+	install -m 0644 ${S}/rkaiq/iqfiles/$IQFILES_DIR/*.json \
+		${D}${sysconfdir}/iqfiles/
 
 	install -d ${D}${sysconfdir}/init.d
 	install -m 0755 ${WORKDIR}/rkaiq_daemons.sh ${D}${sysconfdir}/init.d/

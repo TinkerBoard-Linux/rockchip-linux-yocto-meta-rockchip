@@ -3,10 +3,11 @@
 
 require conf/machine/include/rockchip-arm64-common.inc
 
-SOC_FAMILY := "rk3399"
+RK_SOC_FAMILY := "rk3399"
 
 PREFERRED_VERSION_linux-rockchip := "4.19%"
 LINUXLIBCVERSION := "4.19-custom%"
+OLDEST_KERNEL := "4.19"
 
 MALI_GPU := "midgard-t86x"
 MALI_VERSION := "r18p0"
